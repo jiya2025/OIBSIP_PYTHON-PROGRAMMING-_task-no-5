@@ -1,0 +1,56 @@
+server.py-chat server
+
+import socket
+import threading
+
+def handle_client(conn, addr):
+    print(f"[NEW CONNECTION] {addr} connected.")
+    conn.send("👋 Hello from Server! Start chatting...\n".encode())
+
+    while True:
+        msg = conn.recv(1024).decode()
+        if msg.lower() == 'bye':
+            print("👋 Client left the chat.")
+            break
+        print(f"[Client]: {msg}")
+        reply = input("🧠 You (Server): ")
+        conn.send(reply.encode())
+
+    conn.close()
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(("localhost", 5555))
+server.listen(1)
+print("[STARTING] Server is waiting for connection...")
+
+conn, addr = server.accept()
+thread = threading.Thread(target=handle_client, args=(conn, addr))
+thread.start()
+
+client.py-chat client
+
+import socket
+import threading
+
+def receive_messages(sock):
+    while True:
+        try:
+            msg = sock.recv(1024).decode()
+            print(f"\n💬 Server says: {msg}")
+        except:
+            print("❌ Connection closed.")
+            break
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(("localhost", 5555))
+
+thread = threading.Thread(target=receive_messages, args=(client,))
+thread.start()
+
+print("🤖 You are connected! Type your message or 'bye' to exit.")
+while True:
+    message = input("🧑 You (Client): ")
+    client.send(message.encode())
+    if message.lower() == 'bye':
+        print("👋 Exiting chat.")
+        break
